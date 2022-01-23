@@ -31,24 +31,7 @@
 
             
 function cardiac_pump()
-    
-%     % Time parameters
-%     [T,DT,Ts1,Ts2,Tpwb,Tpww] = time_parameters();
-%     % Heart parameters
-%     [LHEART_CONSTANT,RHEART_CONSTANT] = heart_data();
-%     % systemic & pulmonary parameters
-%     [SYS_CONSTANT,PUL_CONSTANT] = circulation_data();
-%     % Ventricular and atrium elastances
-%     [ELV,ERV,ELA,ERA,t] = elast(LHEART_CONSTANT,RHEART_CONSTANT,T,DT,Ts1,Ts2,Tpwb,Tpww);
-%     
-%     figure;plot(t,ELV,'k','LineWidth',3), hold on, plot(t,ELA,'k--','LineWidth',3);
-%     plot(t,ERV,'r','LineWidth',3), plot(t,ERA,'r--','LineWidth',1);
-%     grid on, hold off;
-%     legend('Left ventricule','Right atrium','Right ventricule','Right atrium');
-    
-    
-    
-    
+        
     % Variables Initialisation and time period discretisation
     [Vini,tini,DT] = init();
     time = tini;
@@ -166,34 +149,20 @@ function [VSYS,VPUL] = solvePQV(VINI)
     
     for i=1:length(t)-1
         
-        %VLV(i+1)=rk4(VLV(i),QMI(i)-QAO(i),DT);
         VLV(i+1) = VLV(i) + DT*(QMI(i)-QAO(i));
-        %VLA(i+1)=rk4(VLA(i),QPVN(i)-QMI(i),DT);
         VLA(i+1) = VLA(i) + DT*(QPVN(i)-QMI(i));
-        %PSAS(i+1)=rk4(PSAS(i),(QAO(i)-QSAS(i))/SYS_CONSTANT(1),DT);
         PSAS(i+1) = PSAS(i) + DT*(QAO(i)-QSAS(i))/SYS_CONSTANT(1);
-        %QSAS(i+1)=rk4(QSAS(i),(PSAS(i)-PSAT(i)-SYS_CONSTANT(2)*QSAS(i))/SYS_CONSTANT(3),DT);
         QSAS(i+1) = QSAS(i) + DT*(PSAS(i)-PSAT(i)-SYS_CONSTANT(2)*QSAS(i))/SYS_CONSTANT(3);
-        %PSAT(i+1)=rk4(PSAT(i),(QSAS(i)-QSAT(i))/SYS_CONSTANT(4),DT);
         PSAT(i+1) = PSAT(i) + DT*(QSAS(i)-QSAT(i))/SYS_CONSTANT(4);
-        %QSAT(i+1)=rk4(QSAT(i),(PSAS(i)-PSVN(i)-(SYS_CONSTANT(5)+SYS_CONSTANT(7)+SYS_CONSTANT(8))*QSAS(i))/SYS_CONSTANT(6),DT);
         QSAT(i+1) = QSAT(i) + DT*(PSAS(i)-PSVN(i)-(SYS_CONSTANT(5)+SYS_CONSTANT(7)+SYS_CONSTANT(8))*QSAS(i))/SYS_CONSTANT(6);
-        %PSVN(i+1)=rk4(PSVN(i),(QSAT(i)-QSVN(i))/SYS_CONSTANT(10),DT);
         PSVN(i+1) = PSVN(i) + DT*(QSAT(i)-QSVN(i))/SYS_CONSTANT(10);
         
-        %VRV(i+1)=rk4(VRV(i),QTI(i)-QPO(i),DT);
         VRV(i+1) = VRV(i) + DT*(QTI(i)-QPO(i));
-        %VRA(i+1)=rk4(VRA(i),QSVN(i)-QTI(i),DT);
         VRA(i+1) = VRA(i) + DT*(QSVN(i)-QTI(i));
-        %PPAS(i+1)=rk4(PPAS(i),(QPO(i)-QPAS(i))/PUL_CONSTANT(1),DT);
         PPAS(i+1) = PPAS(i) + DT*(QPO(i)-QPAS(i))/PUL_CONSTANT(1);
-        %QPAS(i+1)=rk4(QPAS(i),(PPAS(i)-PPAT(i)-PUL_CONSTANT(2)*QPAS(i))/PUL_CONSTANT(3),DT);
         QPAS(i+1) = QPAS(i) + DT*(PPAS(i)-PPAT(i)-PUL_CONSTANT(2)*QPAS(i))/PUL_CONSTANT(3);
-        %PPAT(i+1)=rk4(PPAT(i),(QPAS(i)-QPAT(i))/PUL_CONSTANT(4),DT);
         PPAT(i+1) = PPAT(i) + DT*(QPAS(i)-QPAT(i))/PUL_CONSTANT(4);
-        %QPAT(i+1)=rk4(QPAT(i),(PPAS(i)-PPVN(i)-(PUL_CONSTANT(5)+PUL_CONSTANT(7)+PUL_CONSTANT(8))*QPAS(i))/PUL_CONSTANT(6),DT);
         QPAT(i+1) = QPAT(i) + DT*(PPAS(i)-PPVN(i)-(PUL_CONSTANT(5)+PUL_CONSTANT(7)+PUL_CONSTANT(8))*QPAS(i))/PUL_CONSTANT(6);
-        %PPVN(i+1)=rk4(PPVN(i),(QPAT(i)-QPVN(i))/PUL_CONSTANT(10),DT);
         PPVN(i+1) = PPVN(i) + DT*(QPAT(i)-QPVN(i))/PUL_CONSTANT(10);
 
         % Systemic
