@@ -1,0 +1,36 @@
+% Elastance du tube
+1367000
+% Section du tube
+0.1361
+% Longueur du tube
+25
+% Densité du fluide
+1.06
+% Viscosité du fluide
+0.035
+% Résistance périphérique
+34875
+% Compliance périphérique
+52049
+% Pas de temps
+0.0005
+% Type de signal entrée
+3
+% Type de condition sortie
+2
+% Période
+0.85
+% Nombre de période
+10
+% Débit entrée Pression de sortie
+3.7370
+9
+0    1.1751    2.3502    3.5253    4.7004    5.8754    7.0505    8.2256    9.4007
+0.0000    0.9023    0.9427    0.5574    0.2024    0.3674    0.0511    0.0746    0.0612
+0   -1.2082   -1.6681   -2.9007   -2.1281    2.9571    1.9839    3.0493    2.5193
+5.8317
+% Pression entrée
+105.9632
+0.0000   11.8206    6.2184    2.6715    0.7828    1.7817    0.4097    0.5842    0.5019
+3.1416   -2.1134   -2.5343    2.7557   -2.2939    3.0239    2.0093    3.0700    2.2899
+
