@@ -8,8 +8,8 @@ d'illustration du cours
 # Documents
 Articles, théses, livres,...
 
-# 0D models
+# 0D MODELS
 codes Matlab de modèles 0D de circulation sanguine
 
-# 1D models
+# 1D MODELS
 codes Matlab de modèles 1D de circulation sanguine
