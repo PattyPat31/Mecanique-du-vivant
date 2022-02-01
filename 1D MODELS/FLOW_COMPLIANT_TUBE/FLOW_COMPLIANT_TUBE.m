@@ -59,8 +59,17 @@ function FLOW_COMPLIANT_TUBE()
     RPI=sqrt(pi);
 
     % INITIALISATION pression
+%     PEM= Pin;
+%     for mode=1:NMODE
+%         PEM = PEM + AMP_pressure(mode)*mmHg*cos(PHASE_pressure(mode));
+%     end
+%     Pin/mmHg
+%     Pout/mmHg
+%     PEM/mmHg
+%     (ResT*QMEAN+Pout)/mmHg
+%     pause
     PEM=Pin;
-    PSM=Pin-8*pi*mu*NBB/RO*QMEAN*LT/A0^2;
+    PSM=PEM-8*pi*mu*NBB/RO*QMEAN*LT/A0^2;
     DPI=(PEM-PSM)/(NX-1);
     PC=PSM-Z0*QMEAN;
     P(1)=PEM;
@@ -80,7 +89,7 @@ function FLOW_COMPLIANT_TUBE()
 
     %          CALCUL LC CYCLE(S)
     time(1) = 0.0;
-    tsortie = [];
+    tsortie = 0.0;
     % -------------------
     % Début boucle cycles
     % -------------------
@@ -126,9 +135,9 @@ function FLOW_COMPLIANT_TUBE()
 
                 case 4
                 % Pression à l'entrée du tube (physiologique)
-                PLE= PEM;
+                PLE= Pin;
                 for mode=1:NMODE
-                    PLE = PLE + real(AMP_pressure(mode)*mmHg*exp(1i*2*pi*frequencies(mode)*N*DT+1i*PHASE_pressure(mode)));
+                    PLE = PLE + AMP_pressure(mode)*mmHg*cos(2*pi*frequencies(mode)*N*DT+PHASE_pressure(mode));
                 end
                 ALE=(PLE/EL+1)*A0;
                 S1=U(1)*U(1)/2.+P(1)/RO;
@@ -185,9 +194,30 @@ function FLOW_COMPLIANT_TUBE()
                 DEB1=A(NX-1)*U(NX-1);
                 ALS=A(NX)-DT/DX*(DEB-DEB1);
                 PLS=EL*(ALS/A0-1);             
-                QLS=(PLS-Pout)/ResT;        % Q(n+1) débit dans R
+                QLS=(PLS-0.0)/ResT;        % Q(n+1) débit dans R
                 ULS=QLS/ALS;
                 TLS = -4*mu*sqrt(pi/ALS)*ULS;
+                
+                case 3
+                % Condition débit imposé
+                QLS = QMEAN;
+                S1=U(NX-1)*A(NX-1);
+                S2=U(NX)*A(NX);
+                ALS=A(NX)+R*(S1-S2);
+                ULS=QLS/ALS;
+                PLS=EL*(ALS/A0-1);
+                TLS = -4*mu*sqrt(pi/ALS)*ULS;
+
+                case 4
+                % Condition pression imposée
+                PLS=PSM;
+                ALS=(PLS/EL+1)*A0;
+                S1=U(NX-1)*U(NX-1)/2.+P(NX-1)/RO;
+                S2=U(NX)*U(NX)/2.+P(NX)/RO;
+                TO=(2*RPI*DT/RO)*T(NX)/sqrt(A(NX));
+                ULS=U(NX)+R*(S1-S2)+TO;
+                TLS = -4*mu*sqrt(pi/ALS)*ULS;
+                
             end
 
             %......................................
@@ -356,32 +386,10 @@ function []=visu(DX,LT,NX,tsortie)
     global mmHg
 
     x = [0:DX:LT];
-    milieu = (NX-1)/2;
+    % Définir si nécessaire un indice supplémentaire de visualisation dans
+    % le tube, comme par exemple: milieu = fix((NX-1)/2);
+    
     output = fopen('sortie.dat','r');
-
-    % Extraction des données d'initialisation
-    for i=1:NX
-        scan = fscanf(output,'%f',5);
-        debit_ini(i) = scan(1);
-        section_ini(i)= scan(2);
-        velocity_ini(i) = scan(3);
-        pressure_ini(i) = scan(4)/mmHg;
-        tau_ini(i) = scan(5);
-    end
-
-    % Enlever les commentaires suivant les figures souhaitées
-    %--------------------------------------------------------
-    %title1 = strcat('\bf Section evolution (Initialisation)');
-    %figure;plot(x,section_ini);title(title1);xlabel('\bf x');grid on;
-    %title2 = strcat('\bf Velocity evolution (Initialisation)');
-    %figure;plot(x,velocity_ini);title(title2);xlabel('\bf x');grid on;
-    %title3 = strcat('\bf Pressure evolution (Initialisation)');
-    %figure;plot(x,pressure_ini);title(title3);xlabel('\bf x');grid on;
-    %title4 = strcat('\bf Tau evolution (Initialisation)');
-    %figure;plot(x,tau_ini);title(title4);xlabel('\bf x');grid on;
-    %title5 = strcat('\bf Debit evolution (Initialisation)');        
-    %figure;plot(x,debit_ini);title(title5);xlabel('\bf x');grid on;
-
 
     % Evolution en temps à l'entrée, au milieu et à la sortie du tube
     for i=1:length(tsortie)
@@ -392,15 +400,17 @@ function []=visu(DX,LT,NX,tsortie)
         pressure_entree(i) = scan(4)/mmHg;
         tau_entree(i) = scan(5);
 
-        fscanf(output,'%f',5*(milieu-1));
-        scan = fscanf(output,'%f',5);
-        debit_milieu(i) = scan(1);
-        section_milieu(i)= scan(2);
-        velocity_milieu(i) = scan(3);
-        pressure_milieu(i) = scan(4)/mmHg;
-        tau_milieu(i) = scan(5);
+%         fscanf(output,'%f',5*(milieu-2));
+%         scan = fscanf(output,'%f',5);
+%         debit_milieu(i) = scan(1);
+%         section_milieu(i)= scan(2);
+%         velocity_milieu(i) = scan(3);
+%         pressure_milieu(i) = scan(4)/mmHg;
+%         tau_milieu(i) = scan(5);
+% 
+%         fscanf(output,'%f',5*(NX-milieu-1));
 
-        fscanf(output,'%f',5*(milieu-1));
+        fscanf(output,'%f',5*(NX-2));
         scan = fscanf(output,'%f',5);
         debit_sortie(i) = scan(1);
         section_sortie(i)= scan(2);
@@ -439,12 +449,12 @@ function []=visu(DX,LT,NX,tsortie)
     %figure;plot(tsortie,section_milieu);title(title1);xlabel('\bf time');grid on;
     %title2 = strcat('\bf Velocity time evolution (Milieu du tube)');
     %figure;plot(tsortie,velocity_milieu);title(title2);xlabel('\bf time'); grid on;%axis([0 4 min(min(velocity_milieu)) max(max(velocity_milieu))]);grid on;
-    title3 = strcat('\bf Pressure time evolution (Milieu du tube)');
-    figure;plot(tsortie,pressure_milieu);title(title3);xlabel('\bf time'); grid on;%axis([0 4 min(min(pressure_milieu)) max(max(pressure_milieu))]);grid on;
+    %title3 = strcat('\bf Pressure time evolution (Milieu du tube)');
+    %figure;plot(tsortie,pressure_milieu);title(title3);xlabel('\bf time'); grid on;%axis([0 4 min(min(pressure_milieu)) max(max(pressure_milieu))]);grid on;
     %title4 = strcat('\bf Tau time evolution (Milieu du tube)');
     %figure;plot(tsortie,tau_milieu);title(title4);xlabel('\bf time');grid on;
-    title5 = strcat('\bf Debit time evolution (Milieu du tube)');        
-    figure;plot(tsortie,debit_milieu);title(title5);xlabel('\bf time');grid on;
+    %title5 = strcat('\bf Debit time evolution (Milieu du tube)');        
+    %figure;plot(tsortie,debit_milieu);title(title5);xlabel('\bf time');grid on;
 
     fclose(output);
 

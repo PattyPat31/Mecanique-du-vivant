@@ -13,11 +13,11 @@
 % Compliance périphérique
 52049
 % Pas de temps
-0.0005
+0.0001
 % Type de signal entrée
 3
 % Type de condition sortie
-2
+1
 % Période
 0.85
 % Nombre de période
